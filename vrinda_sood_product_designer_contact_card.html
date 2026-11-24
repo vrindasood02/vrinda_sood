@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Vrinda Sood — Product Designer Contact Card</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pine: {
+                            950: '#081710',
+                            900: '#0c2118',
+                            800: '#143829',
+                            700: '#1d4d39',
+                            600: '#2b6149',
+                        },
+                        sage: {
+                            100: '#eef4f0',
+                            200: '#d0e2d6',
+                            300: '#a8c3b4',
+                            400: '#769686',
+                        },
+                        ivory: {
+                            50: '#fcfbf8',
+                            100: '#f9f7f2',
+                            200: '#efeae0',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Mobile-first safe viewport & background */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            background-color: #0c2118;
+            background-image:
+                radial-gradient(circle at 20% 15%, rgba(43, 97, 73, 0.28) 0%, transparent 52%),
+                radial-gradient(circle at 85% 85%, rgba(20, 56, 41, 0.5) 0%, transparent 58%),
+                linear-gradient(155deg, #091a12 0%, #0c2118 50%, #081710 100%);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Subtle cotton paper grain */
+        .paper-grain {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+        }
+
+        /* Fluid responsive card dimensions */
+        .card-stage {
+            width: min(92vw, 390px);
+            min-height: 520px;
+            perspective: 1400px;
+            -webkit-perspective: 1400px;
+            position: relative;
+        }
+
+        /* Desktop-only smooth 3D pointer tilt wrapper */
+        .card-tilt-layer {
+            width: 100%;
+            min-height: 520px;
+            transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        }
+
+        /* 3D Flipper Container (Grid stack ensures intrinsic height & prevents mobile WebKit collapse) */
+        .card-flipper {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+            width: 100%;
+            min-height: 520px;
+            position: relative;
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+            transition: transform 0.72s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .card-flipper.is-flipped {
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+        }
+
+        /* Card Faces: Stacked in grid cell 1/1 with explicit visibility & opacity safeguards for iOS Safari */
+        .card-face {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+            width: 100%;
+            min-height: 520px;
+            border-radius: 1.25rem;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            box-shadow:
+                0 24px 48px -12px rgba(4, 12, 8, 0.7),
+                0 0 0 1px rgba(168, 195, 180, 0.22);
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            position: relative;
+        }
+
+        .card-front {
+            transform: rotateY(0deg) translateZ(1px);
+            -webkit-transform: rotateY(0deg) translateZ(1px);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        .card-back {
+            transform: rotateY(180deg) translateZ(1px);
+            -webkit-transform: rotateY(180deg) translateZ(1px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* When flipped, swap opacity, visibility & pointer-events cleanly so mobile WebKit never renders blank */
+        .card-flipper.is-flipped .card-front {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card-flipper.is-flipped .card-back {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        /* Desktop-only ambient glare */
+        .card-glare {
+            position: absolute;
+            inset: 0;
+            border-radius: 1.25rem;
+            pointer-events: none;
+            background: radial-gradient(
+                circle at var(--glare-x, 50%) var(--glare-y, 50%),
+                rgba(255, 255, 255, 0.22) 0%,
+                rgba(208, 226, 214, 0.06) 35%,
+                transparent 70%
+            );
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            z-index: 20;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .card-stage:hover .card-glare {
+                opacity: var(--glare-opacity, 0);
+            }
+        }
+
+        /* Toast states */
+        .toast-visible {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+        }
+
+        .toast-hidden {
+            opacity: 0;
+            transform: translate(-50%, 14px) scale(0.96);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="text-ivory-100 selection:bg-sage-200 selection:text-pine-900">
+
+    <!-- Top Status Bar -->
+    <header class="w-full max-w-[390px] flex items-center justify-between mb-4 px-1">
+        <div class="flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sage-300 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-sage-300"></span>
+            </span>
+            <span class="text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-200">Freelance Available</span>
+        </div>
+        <span id="flipHintText" class="text-[11px] font-medium uppercase tracking-[0.16em] text-sage-300/85">Tap Card to Flip</span>
+    </header>
+
+    <!-- Main Interactive Card Stage -->
+    <main class="w-full flex flex-col items-center">
+        <div id="cardStage" class="card-stage">
+            <div id="cardTiltLayer" class="card-tilt-layer">
+                <div id="cardFlipper" class="card-flipper" role="button" tabindex="0" aria-label="Interactive contact card for Vrinda Sood. Tap to flip between front and back.">
+
+                    <!-- ==================== FRONT FACE (Warm Ivory Cotton) ==================== -->
+                    <article class="card-face card-front bg-ivory-100 paper-grain text-pine-800 p-3.5 sm:p-4 flex flex-col">
+                        <div class="card-glare"></div>
+
+                        <!-- Outer Forest Pine Architectural Border -->
+                        <div class="w-full flex-1 border-[1.5px] border-pine-800 rounded-xl p-1.5 flex flex-col">
+                            <!-- Inner Fine Sage Hairline Border -->
+                            <div class="w-full flex-1 border border-sage-400/75 rounded-lg px-5 py-6 flex flex-col justify-between">
+
+                                <!-- Top Metadata Header -->
+                                <div class="flex items-center justify-center gap-2 pb-3.5 border-b border-sage-300/60 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] text-pine-600">
+                                    <span class="text-sage-400" aria-hidden="true">✦</span>
+                                    <span>Toronto, Canada</span>
+                                    <span class="text-sage-400" aria-hidden="true">✦</span>
+                                </div>
+
+                                <!-- Centerpiece Monogram & Editorial Name -->
+                                <div class="my-auto py-6 flex flex-col items-center text-center">
+                                    <!-- Circular Italicized VS Emblem -->
+                                    <div class="w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full border border-pine-800 bg-sage-100 flex items-center justify-center mb-5 relative shadow-sm">
+                                        <div class="absolute inset-1 rounded-full border border-dashed border-sage-400/70"></div>
+                                        <span class="font-serif italic text-2xl sm:text-[28px] tracking-wider text-pine-800">VS</span>
+                                    </div>
+
+                                    <!-- Editorial Serif Display Name -->
+                                    <h1 class="font-serif text-[36px] sm:text-[42px] leading-[1.08] font-normal tracking-tight text-pine-900 mb-2.5">
+                                        Vrinda <em class="italic font-normal text-pine-600">Sood</em>
+                                    </h1>
+
+                                    <!-- Wide-Tracked Role -->
+                                    <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-pine-600">
+                                        Product Designer
+                                    </p>
+
+                                    <!-- Botanical Diamond Divider -->
+                                    <div class="flex items-center gap-2.5 mt-5" aria-hidden="true">
+                                        <span class="w-7 h-[1px] bg-sage-300"></span>
+                                        <span class="w-1.5 h-1.5 rotate-45 border border-pine-600"></span>
+                                        <span class="w-7 h-[1px] bg-sage-300"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Bottom Contact Rule & Interactive Links -->
+                                <div class="pt-3.5 border-t border-sage-300/60 flex flex-col gap-2.5 text-xs">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[10px] font-semibold uppercase tracking-[0.16em] text-sage-400 shrink-0">Email</span>
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <a href="mailto:vrindasood02@gmail.com"
+                                               data-no-flip="true"
+                                               class="font-medium text-pine-800 hover:text-pine-600 border-b border-pine-600/40 hover:border-pine-800 transition-colors truncate">
+                                                vrindasood02@gmail.com
+                                            </a>
+                                            <button type="button"
+                                                    data-no-flip="true"
+                                                    onclick="copyText('vrindasood02@gmail.com', 'Email copied!')"
+                                                    aria-label="Copy email address"
+                                                    class="p-1 rounded hover:bg-sage-200/70 text-pine-600 transition-colors shrink-0">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-[10px] font-semibold uppercase tracking-[0.16em] text-sage-400 shrink-0">Phone</span>
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <a href="tel:+16478210811"
+                                               data-no-flip="true"
+                                               class="font-medium text-pine-800 hover:text-pine-600 border-b border-pine-600/40 hover:border-pine-800 transition-colors">
+                                                +1 6478210811
+                                            </a>
+                                            <button type="button"
+                                                    data-no-flip="true"
+                                                    onclick="copyText('+1 6478210811', 'Phone copied!')"
+                                                    aria-label="Copy phone number"
+                                                    class="p-1 rounded hover:bg-sage-200/70 text-pine-600 transition-colors shrink-0">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- ==================== BACK FACE (Deep Forest Pine Directory & QR) ==================== -->
+                    <article class="card-face card-back bg-pine-800 paper-grain text-ivory-100 p-3.5 sm:p-4 flex flex-col">
+                        <div class="card-glare"></div>
+
+                        <!-- Outer Sage/Ivory Architectural Frame -->
+                        <div class="w-full flex-1 border-[1.5px] border-sage-300/70 rounded-xl p-1.5 flex flex-col">
+                            <div class="w-full flex-1 border border-sage-200/25 rounded-lg px-5 py-5 flex flex-col justify-between">
+
+                                <!-- Back Header -->
+                                <div class="flex items-center justify-between pb-3 border-b border-sage-200/15">
+                                    <div>
+                                        <h2 class="font-serif text-2xl text-ivory-100 leading-none">Vrinda <em class="italic text-sage-300">Sood</em></h2>
+                                        <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-sage-300 mt-1.5">Product Designer • Toronto, Canada</p>
+                                    </div>
+                                    <div class="w-9 h-9 rounded-full border border-sage-300/50 bg-pine-900/60 flex items-center justify-center font-serif italic text-sm text-sage-200 shrink-0">
+                                        VS
+                                    </div>
+                                </div>
+
+                                <!-- Core Capabilities -->
+                                <div class="my-3">
+                                    <p class="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-sage-300 mb-2">Core Capabilities</p>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <span class="px-2.5 py-1 rounded-md bg-pine-900/80 border border-sage-300/25 text-[11px] font-medium text-ivory-100">UX/UI Systems</span>
+                                        <span class="px-2.5 py-1 rounded-md bg-pine-900/80 border border-sage-300/25 text-[11px] font-medium text-ivory-100">Digital Products</span>
+                                        <span class="px-2.5 py-1 rounded-md bg-pine-900/80 border border-sage-300/25 text-[11px] font-medium text-ivory-100">Prototyping &amp; Brand Craft</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tap-to-Copy Contact Directory -->
+                                <div class="space-y-2.5 my-auto py-1">
+                                    <!-- Email Row -->
+                                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-pine-900/75 border border-sage-300/20">
+                                        <div class="min-w-0 pr-2">
+                                            <span class="block text-[9px] font-semibold uppercase tracking-[0.18em] text-sage-300">Direct Email</span>
+                                            <a href="mailto:vrindasood02@gmail.com"
+                                               data-no-flip="true"
+                                               class="block text-xs font-medium text-ivory-100 hover:text-sage-200 truncate mt-0.5">
+                                                vrindasood02@gmail.com
+                                            </a>
+                                        </div>
+                                        <button type="button"
+                                                data-no-flip="true"
+                                                onclick="copyText('vrindasood02@gmail.com', 'Email copied to clipboard')"
+                                                class="shrink-0 px-3 py-1.5 rounded-md bg-sage-200/15 hover:bg-sage-200 hover:text-pine-900 active:scale-95 text-sage-200 text-[10px] font-semibold uppercase tracking-wider transition-all">
+                                            Copy
+                                        </button>
+                                    </div>
+
+                                    <!-- Phone Row -->
+                                    <div class="flex items-center justify-between p-2.5 rounded-lg bg-pine-900/75 border border-sage-300/20">
+                                        <div class="min-w-0 pr-2">
+                                            <span class="block text-[9px] font-semibold uppercase tracking-[0.18em] text-sage-300">Telephone / WhatsApp</span>
+                                            <a href="tel:+16478210811"
+                                               data-no-flip="true"
+                                               class="block text-xs font-medium text-ivory-100 hover:text-sage-200 mt-0.5">
+                                                +1 6478210811
+                                            </a>
+                                        </div>
+                                        <button type="button"
+                                                data-no-flip="true"
+                                                onclick="copyText('+1 6478210811', 'Phone copied to clipboard')"
+                                                class="shrink-0 px-3 py-1.5 rounded-md bg-sage-200/15 hover:bg-sage-200 hover:text-pine-900 active:scale-95 text-sage-200 text-[10px] font-semibold uppercase tracking-wider transition-all">
+                                            Copy
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Inline SVG QR Code Footer -->
+                                <div class="pt-3 border-t border-sage-200/15 flex items-center justify-between gap-3">
+                                    <div class="text-left">
+                                        <span class="block text-[10px] font-semibold uppercase tracking-[0.18em] text-sage-200">Scan vCard QR</span>
+                                        <span class="block text-[11px] text-sage-300/90 mt-0.5 leading-snug">Point camera to save contact directly</span>
+                                    </div>
+                                    <div id="qrContainer" class="w-16 h-16 rounded-lg bg-ivory-100 p-1.5 shrink-0 flex items-center justify-center shadow-md" aria-label="QR Code for Vrinda Sood vCard">
+                                        <!-- Inline SVG QR rendered by JS -->
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== RESPONSIVE ACTION BAR ==================== -->
+        <nav class="w-full max-w-[390px] mt-5 flex flex-wrap gap-2.5" aria-label="Contact Card Quick Actions">
+            <button id="flipBtn"
+                    type="button"
+                    class="flex-1 min-w-[110px] flex items-center justify-center gap-2 px-3.5 py-3 rounded-xl bg-pine-800 hover:bg-pine-700 active:scale-[0.98] border border-sage-300/30 text-ivory-100 text-xs font-semibold uppercase tracking-[0.12em] transition-all shadow-lg">
+                <svg class="w-4 h-4 text-sage-300 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Flip Card</span>
+            </button>
+
+            <button id="saveVcfBtn"
+                    type="button"
+                    class="flex-1 min-w-[155px] flex items-center justify-center gap-2 px-3.5 py-3 rounded-xl bg-ivory-100 hover:bg-sage-200 active:scale-[0.98] text-pine-900 text-xs font-bold uppercase tracking-[0.12em] transition-all shadow-lg">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Save Contact (.vcf)</span>
+            </button>
+
+            <button type="button"
+                    onclick="copyText('vrindasood02@gmail.com', 'Email copied to clipboard')"
+                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-pine-950/75 hover:bg-pine-800/80 active:scale-[0.98] border border-sage-300/20 text-sage-200 text-xs font-semibold uppercase tracking-[0.14em] transition-all">
+                <svg class="w-3.5 h-3.5 text-sage-300 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>Copy Email</span>
+            </button>
+        </nav>
+    </main>
+
+    <!-- Toast Notification Banner -->
+    <div id="toast"
+         role="status"
+         aria-live="polite"
+         class="fixed bottom-6 left-1/2 z-50 flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-ivory-100 text-pine-900 shadow-2xl border border-pine-800/20 transition-all duration-300 toast-hidden">
+        <span class="w-5 h-5 rounded-full bg-pine-800 text-ivory-100 flex items-center justify-center shrink-0">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+        </span>
+        <span id="toastMessage" class="text-xs font-semibold tracking-wide whitespace-nowrap">Copied to clipboard</span>
+    </div>
+
+    <script>
+        (function() {
+            const CONTACT = {
+                firstName: 'Vrinda',
+                lastName: 'Sood',
+                fullName: 'Vrinda Sood',
+                title: 'Product Designer',
+                email: 'vrindasood02@gmail.com',
+                phone: '+1 6478210811',
+                phoneClean: '+16478210811',
+                city: 'Toronto',
+                country: 'Canada',
+                note: 'UX/UI Systems, Digital Products, Prototyping & Brand Craft'
+            };
+
+            const cardStage = document.getElementById('cardStage');
+            const cardTiltLayer = document.getElementById('cardTiltLayer');
+            const cardFlipper = document.getElementById('cardFlipper');
+            const flipBtn = document.getElementById('flipBtn');
+            const saveVcfBtn = document.getElementById('saveVcfBtn');
+            const flipHintText = document.getElementById('flipHintText');
+            const toastEl = document.getElementById('toast');
+            const toastMsgEl = document.getElementById('toastMessage');
+
+            let isFlipped = false;
+            let toastTimer = null;
+
+            // 1. Clean 3D Card Flip Toggle (Safe across iOS Safari, Android Chrome & Desktop)
+            function setFlipped(nextState) {
+                isFlipped = typeof nextState === 'boolean' ? nextState : !isFlipped;
+                cardFlipper.classList.toggle('is-flipped', isFlipped);
+                if (flipHintText) {
+                    flipHintText.textContent = isFlipped ? 'Tap Card for Front' : 'Tap Card to Flip';
+                }
+            }
+
+            // Tap/Click on card flips unless user tapped an interactive link or button inside the card
+            cardFlipper.addEventListener('click', function(e) {
+                if (e.target.closest('a, button, [data-no-flip="true"]')) {
+                    return;
+                }
+                setFlipped();
+            });
+
+            // Keyboard accessibility for card flip
+            cardFlipper.addEventListener('keydown', function(e) {
+                if (e.target !== cardFlipper) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setFlipped();
+                }
+            });
+
+            flipBtn.addEventListener('click', function() {
+                setFlipped();
+            });
+
+            // 2. Desktop-Only Smooth Pointer Tilt (Disabled on touch devices to prevent mobile WebKit glitches)
+            const supportsFineHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+            if (supportsFineHover && cardStage && cardTiltLayer) {
+                cardStage.addEventListener('mousemove', function(e) {
+                    const rect = cardStage.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+
+                    const rotateX = ((y - centerY) / centerY) * -7;
+                    const rotateY = ((x - centerX) / centerX) * 7;
+
+                    cardTiltLayer.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+
+                    const glareX = (x / rect.width) * 100;
+                    const glareY = (y / rect.height) * 100;
+                    cardStage.style.setProperty('--glare-x', `${glareX.toFixed(1)}%`);
+                    cardStage.style.setProperty('--glare-y', `${glareY.toFixed(1)}%`);
+                    cardStage.style.setProperty('--glare-opacity', '1');
+                });
+
+                cardStage.addEventListener('mouseleave', function() {
+                    cardTiltLayer.style.transform = 'rotateX(0deg) rotateY(0deg)';
+                    cardStage.style.setProperty('--glare-opacity', '0');
+                });
+            }
+
+            // 3. Toast Feedback Helper
+            window.showToast = function(message) {
+                toastMsgEl.textContent = message;
+                toastEl.classList.remove('toast-hidden');
+                toastEl.classList.add('toast-visible');
+
+                if (toastTimer) clearTimeout(toastTimer);
+                toastTimer = setTimeout(function() {
+                    toastEl.classList.remove('toast-visible');
+                    toastEl.classList.add('toast-hidden');
+                }, 2400);
+            };
+
+            // 4. One-Click Clipboard Copy (with iFrame & mobile Safari fallback)
+            window.copyText = function(text, successMsg) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.setAttribute('readonly', '');
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                textArea.style.top = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                textArea.setSelectionRange(0, 99999);
+
+                let copied = false;
+                try {
+                    copied = document.execCommand('copy');
+                } catch (err) {
+                    copied = false;
+                }
+                document.body.removeChild(textArea);
+
+                if (copied) {
+                    showToast(successMsg || 'Copied to clipboard');
+                } else if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        showToast(successMsg || 'Copied to clipboard');
+                    }).catch(function() {
+                        showToast('Unable to copy');
+                    });
+                } else {
+                    showToast('Unable to copy');
+                }
+            };
+
+            // 5. Generate & Download Standard vCard (.vcf)
+            function buildVCardString() {
+                return [
+                    'BEGIN:VCARD',
+                    'VERSION:3.0',
+                    `N:${CONTACT.lastName};${CONTACT.firstName};;;`,
+                    `FN:${CONTACT.fullName}`,
+                    `TITLE:${CONTACT.title}`,
+                    `TEL;TYPE=CELL,VOICE:${CONTACT.phoneClean}`,
+                    `EMAIL;TYPE=PREF,INTERNET:${CONTACT.email}`,
+                    `ADR;TYPE=WORK:;;;${CONTACT.city};;;${CONTACT.country}`,
+                    `NOTE:${CONTACT.note}`,
+                    'END:VCARD'
+                ].join('\r\n');
+            }
+
+            saveVcfBtn.addEventListener('click', function() {
+                try {
+                    const vcfContent = buildVCardString();
+                    const blob = new Blob([vcfContent], { type: 'text/vcard;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'Vrinda_Sood_Product_Designer.vcf';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    setTimeout(function() {
+                        URL.revokeObjectURL(url);
+                    }, 1500);
+                    showToast('Saved Vrinda_Sood.vcf');
+                } catch (err) {
+                    showToast('Unable to download vCard');
+                }
+            });
+
+            // 6. Self-Contained Inline SVG QR Code Generator (Version 6-L Reed-Solomon)
+            const QR = (function() {
+                const EXP = new Array(512), LOG = new Array(256);
+                let x = 1;
+                for (let i = 0; i < 255; i++) {
+                    EXP[i] = x;
+                    LOG[x] = i;
+                    x = (x << 1) ^ (x & 128 ? 0x11d : 0);
+                }
+                for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+
+                function gfMul(a, b) {
+                    return (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+                }
+
+                function rsGeneratorPoly(ecLen) {
+                    let g = [1];
+                    for (let i = 0; i < ecLen; i++) {
+                        const next = new Array(g.length + 1).fill(0);
+                        for (let j = 0; j < g.length; j++) {
+                            next[j] ^= g[j];
+                            next[j + 1] ^= gfMul(g[j], EXP[i]);
+                        }
+                        g = next;
+                    }
+                    return g;
+                }
+
+                function rsEncode(data, ecLen) {
+                    const gen = rsGeneratorPoly(ecLen);
+                    const res = data.concat(new Array(ecLen).fill(0));
+                    for (let i = 0; i < data.length; i++) {
+                        const coef = res[i];
+                        if (coef !== 0) {
+                            for (let j = 0; j < gen.length; j++) {
+                                res[i + j] ^= gfMul(gen[j], coef);
+                            }
+                        }
+                    }
+                    return res.slice(data.length);
+                }
+
+                function encodeV6L(text) {
+                    const bytes = Array.from(new TextEncoder().encode(text));
+                    const bits = [];
+                    const pushBits = function(val, len) {
+                        for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1);
+                    };
+
+                    pushBits(0b0100, 4); // Byte mode
+                    pushBits(bytes.length, 8);
+                    for (const b of bytes) pushBits(b, 8);
+
+                    const maxDataBits = 136 * 8;
+                    const termLen = Math.min(4, maxDataBits - bits.length);
+                    pushBits(0, termLen);
+                    while (bits.length % 8 !== 0) bits.push(0);
+
+                    const codewords = [];
+                    for (let i = 0; i < bits.length; i += 8) {
+                        let byte = 0;
+                        for (let j = 0; j < 8; j++) byte = (byte << 1) | bits[i + j];
+                        codewords.push(byte);
+                    }
+                    const pads = [0xec, 0x11];
+                    let padIdx = 0;
+                    while (codewords.length < 136) {
+                        codewords.push(pads[padIdx % 2]);
+                        padIdx++;
+                    }
+
+                    const b1 = codewords.slice(0, 68);
+                    const b2 = codewords.slice(68, 136);
+                    const ec1 = rsEncode(b1, 18);
+                    const ec2 = rsEncode(b2, 18);
+
+                    const finalBytes = [];
+                    for (let i = 0; i < 68; i++) finalBytes.push(b1[i], b2[i]);
+                    for (let i = 0; i < 18; i++) finalBytes.push(ec1[i], ec2[i]);
+
+                    const size = 41;
+                    const grid = Array.from({ length: size }, () => new Array(size).fill(null));
+                    const isFunc = Array.from({ length: size }, () => new Array(size).fill(false));
+
+                    function setMod(r, c, val, func = true) {
+                        if (r >= 0 && r < size && c >= 0 && c < size) {
+                            grid[r][c] = val ? 1 : 0;
+                            if (func) isFunc[r][c] = true;
+                        }
+                    }
+
+                    function placeFinder(r0, c0) {
+                        for (let r = -1; r <= 7; r++) {
+                            for (let c = -1; c <= 7; c++) {
+                                const inBox = r >= 0 && r <= 6 && c >= 0 && c <= 6;
+                                const onBorder = r === 0 || r === 6 || c === 0 || c === 6;
+                                const inCenter = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+                                setMod(r0 + r, c0 + c, inBox && (onBorder || inCenter));
+                            }
+                        }
+                    }
+
+                    placeFinder(0, 0);
+                    placeFinder(0, size - 7);
+                    placeFinder(size - 7, 0);
+
+                    for (let r = -2; r <= 2; r++) {
+                        for (let c = -2; c <= 2; c++) {
+                            const val = Math.abs(r) === 2 || Math.abs(c) === 2 || (r === 0 && c === 0);
+                            setMod(34 + r, 34 + c, val);
+                        }
+                    }
+
+                    for (let i = 8; i < size - 8; i++) {
+                        setMod(6, i, i % 2 === 0);
+                        setMod(i, 6, i % 2 === 0);
+                    }
+
+                    for (let i = 0; i < 9; i++) {
+                        if (i !== 6) {
+                            setMod(8, i, 0);
+                            setMod(i, 8, 0);
+                        }
+                    }
+                    for (let i = 0; i < 8; i++) {
+                        setMod(8, size - 1 - i, 0);
+                        setMod(size - 1 - i, 8, 0);
+                    }
+                    setMod(size - 8, 8, 1);
+
+                    const allBits = [];
+                    for (const b of finalBytes) {
+                        for (let i = 7; i >= 0; i--) allBits.push((b >>> i) & 1);
+                    }
+
+                    let bitIdx = 0;
+                    let upward = true;
+                    for (let right = size - 1; right >= 1; right -= 2) {
+                        if (right === 6) right = 5;
+                        for (let step = 0; step < size; step++) {
+                            const r = upward ? size - 1 - step : step;
+                            for (let dx = 0; dx < 2; dx++) {
+                                const c = right - dx;
+                                if (!isFunc[r][c]) {
+                                    const bit = bitIdx < allBits.length ? allBits[bitIdx++] : 0;
+                                    const masked = ((r + c) % 2 === 0) ? (bit ^ 1) : bit;
+                                    grid[r][c] = masked;
+                                }
+                            }
+                        }
+                        upward = !upward;
+                    }
+
+                    const fmt = 0x77c4;
+                    const fmtBits = [];
+                    for (let i = 14; i >= 0; i--) fmtBits.push((fmt >>> i) & 1);
+
+                    const coords1 = [
+                        [8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],
+                        [7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]
+                    ];
+                    const coords2 = [
+                        [size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],
+                        [8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]
+                    ];
+                    for (let i = 0; i < 15; i++) {
+                        grid[coords1[i][0]][coords1[i][1]] = fmtBits[i];
+                        grid[coords2[i][0]][coords2[i][1]] = fmtBits[i];
+                    }
+
+                    return grid;
+                }
+
+                return { encodeV6L };
+            })();
+
+            function renderQRCode() {
+                const container = document.getElementById('qrContainer');
+                if (!container) return;
+
+                const compactVCard = [
+                    'BEGIN:VCARD',
+                    'VERSION:3.0',
+                    'N:Sood;Vrinda',
+                    'FN:Vrinda Sood',
+                    'TITLE:Product Designer',
+                    'TEL:+16478210811',
+                    'EMAIL:vrindasood02@gmail.com',
+                    'ADR:;;;Toronto;;;Canada',
+                    'END:VCARD'
+                ].join('\n');
+
+                try {
+                    const matrix = QR.encodeV6L(compactVCard);
+                    const size = matrix.length;
+                    let rects = '';
+                    for (let r = 0; r < size; r++) {
+                        for (let c = 0; c < size; c++) {
+                            if (matrix[r][c] === 1) {
+                                rects += `<rect x="${c}" y="${r}" width="1" height="1" rx="0.15"/>`;
+                            }
+                        }
+                    }
+                    container.innerHTML = `<svg viewBox="0 0 ${size} ${size}" class="w-full h-full fill-pine-900" shape-rendering="crispEdges" aria-hidden="true">${rects}</svg>`;
+                } catch (e) {
+                    container.innerHTML = `<span class="text-[9px] font-bold text-pine-900">VCARD</span>`;
+                }
+            }
+
+            renderQRCode();
+        })();
+    </script>
+</body>
+</html>
